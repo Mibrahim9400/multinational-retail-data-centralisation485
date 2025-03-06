@@ -33,7 +33,7 @@ Extracting and cleaning data from various sources, including RDS tables, PDFs, A
 
 
 #### DataConnector Class
-A `DatabaseConnector` class was created to establish connections, reads, creates, lists and upload the data into a local PostgreSQL database.
+A `DatabaseConnector` is a fixed class which was created to establish connections, reads, creates, lists and upload the data into a local PostgreSQL database.
 ```
 from sqlalchemy import create_engine, inspect
 import yaml
