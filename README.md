@@ -1,7 +1,7 @@
 # Multinational Retail Data Centralisation
 The Multinational Data Centralisation project focuses on transforming and analyzing large datasets from various sources. It leverages Pandas for data cleaning, generates a STAR-based database schema for efficient storage and access, and develops complex SQL queries for data analysis, offering a comprehensive solution from data acquisition to insightful decision-making.
 
-This course helped me enhance my skills in data extraction from various database sources, cleaning data from multiple sources using Python, and uploading it to my local PostgreSQL database, 'sales_data'.
+This course helped me enhance my skills in data extraction from various database sources, cleaning data from multiple sources using Python, and uploading it to my local PostgreSQL database, `sales_data`.
 
 1. [Milestone 1](#milestone-1)
    - [Description](#description)
@@ -33,7 +33,7 @@ Extracting and cleaning data from various sources, including RDS tables, PDFs, A
 
 
 #### DataConnector Class
-A 'DatabaseConnector' class was created to establish connections, reads, creates, lists and upload the data into a local PostgreSQL database.
+A `DatabaseConnector` class was created to establish connections, reads, creates, lists and upload the data into a local PostgreSQL database.
 ```
 from sqlalchemy import create_engine, inspect
 import yaml
