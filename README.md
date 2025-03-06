@@ -29,10 +29,11 @@ This milestone introduces GitHub for tracking and saving code changes in a GitHu
 
 ## Milestone 2
 ### Description
-Extracting and cleaning data from various sources, including RDS tables, PDFs, APIs, and AWS S3 buckets. A 'DatabaseConnector' class was created to establish connections and upload the data into a local PostgreSQL database.
+Extracting and cleaning data from various sources, including RDS tables, PDFs, APIs, and AWS S3 buckets. 
 
-### User Data
+
 #### DataConnector Class
+A 'DatabaseConnector' class was created to establish connections, reads, creates, lists and upload the data into a local PostgreSQL database.
 ```
 from sqlalchemy import create_engine, inspect
 import yaml
@@ -84,7 +85,7 @@ class DatabaseConnector:
             except Exception:
                 pass
 ```
-
+### User Data
 #### DataExtractor Class 
 ```
 import pandas as pd
