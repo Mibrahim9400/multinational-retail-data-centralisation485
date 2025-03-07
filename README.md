@@ -137,6 +137,13 @@ class DataCleaning:
         table.reset_index(drop=True, inplace=True)  # Reset index after dropping rows
         return table
 
+    def valid_country_code(self, table, country_code_column):
+        """Validates and replaces incorrect country codes."""
+        if country_code_column in table.columns:
+            # Replace incorrect country codes (e.g., "GGB" to "GB")
+            table.loc[table[country_code_column] == "GGB", country_code_column] = "GB"
+        return table
+
     def valid_date(self, table, date_column):
         """Cleans and converts a date column to datetime format, ensuring only valid dates remain."""
         if date_column in table.columns:
@@ -157,6 +164,7 @@ class DataCleaning:
         - Ensuring 'join_date' is in datetime format, handling invalid dates
         """
         table = self.remove_null(table)  # Remove NULL values
+        table = self.valid_country_code(table, 'country_code') # Replaces Wrong Country Code
         table = self.valid_date(table, 'join_date')  # Convert date column
 
         return table
@@ -604,8 +612,61 @@ class DataCleaner:
 ```
 
 ## Milestone 3
+This milestone focuses on designing a star-based database schema to ensure that all columns are properly aligned with their appropriate data types for optimal functionality.
+
+#### Casting `order_table` to Correct Data Type
+```
+SELECT 
+    MAX(LENGTH(card_number::TEXT)) AS max_card_number_length,
+    MAX(LENGTH(store_code::TEXT)) AS max_store_code_length,
+    MAX(LENGTH(product_code::TEXT)) AS max_product_code_length
+FROM orders_table;
+```
+This query calculates the maximum length of values in the `card_number`, `store_code`, and `product_code` columns by first converting them to text format. It uses the `LENGTH()` function to find the length of each value and then returns the highest length found in each column. This helps determine the appropriate maximum size for the `VARCHAR` data type when updating the table schema.
+
+```
+ALTER TABLE orders_table
+ALTER COLUMN date_uuid SET DATA TYPE UUID USING date_uuid::UUID,
+ALTER COLUMN user_uuid SET DATA TYPE UUID USING user_uuid::UUID,
+ALTER COLUMN card_number SET DATA TYPE VARCHAR(19),
+ALTER COLUMN store_code SET DATA TYPE VARCHAR(12),
+ALTER COLUMN product_code SET DATA TYPE VARCHAR(11),
+ALTER COLUMN product_quantity SET DATA TYPE SMALLINT;
+```
+The `ALTER TABLE` statement modifies the `orders_table` schema to update data types for specific columns. 
+- It converts the `date_uuid` and `user_uuid` columns from `TEXT` to `UUID`, ensuring proper UUID formatting.
+- The `card_number`, `store_code`, and `product_code` columns were changed to `VARCHAR` with maximum lengths of 19, 12, and 11 characters, respectively, based on the longest values found in the dataset.
+- The `product_quantity` column was modified from `BIGINT` to `SMALLINT` to optimize storage.
 
 
+#### Casting `dim_user` to Correct Data Type
+
+```
+SELECT MAX(LENGTH(country_code::TEXT)) AS max_country_code_length
+FROM dim_users;
+```
+- Confirm the length of `country_code`.
+
+```
+ALTER TABLE dim_users
+ALTER COLUMN first_name SET DATA TYPE VARCHAR(255),
+ALTER COLUMN last_name SET DATA TYPE VARCHAR(255),
+ALTER COLUMN date_of_birth SET DATA TYPE DATE USING date_of_birth::DATE,
+ALTER COLUMN country_code SET DATA TYPE VARCHAR(2),
+ALTER COLUMN user_uuid SET DATA TYPE UUID USING user_uuid::UUID,
+ALTER COLUMN join_date SET DATA TYPE DATE USING join_date::DATE;
+```
+- Altering the whole `TABLE` as required.
+
+#### Updating and Casting `dim_store_details`
+
+```
+
+```
+
+```
+
+```
 
 ## Milestone 4
 
