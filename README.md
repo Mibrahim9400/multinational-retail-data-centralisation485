@@ -614,7 +614,7 @@ class DataCleaner:
 ## Milestone 3
 This milestone focuses on designing a star-based database schema to ensure that all columns are properly aligned with their appropriate data types for optimal functionality.
 
-#### Casting `order_table` to Correct Data Type
+#### Task 1: Casting `order_table` to Correct Data Type
 ```
 SELECT 
     MAX(LENGTH(card_number::TEXT)) AS max_card_number_length,
@@ -639,7 +639,7 @@ The `ALTER TABLE` statement modifies the `orders_table` schema to update data ty
 - The `product_quantity` column was modified from `BIGINT` to `SMALLINT` to optimize storage.
 
 
-#### Casting `dim_user` to Correct Data Type
+#### Task 2: Casting `dim_user` to Correct Data Type:
 
 ```
 SELECT MAX(LENGTH(country_code::TEXT)) AS max_country_code_length
@@ -658,15 +658,175 @@ ALTER COLUMN join_date SET DATA TYPE DATE USING join_date::DATE;
 ```
 - Altering the whole `TABLE` as required.
 
-#### Updating and Casting `dim_store_details`
+#### Task 3: Updating and Casting `dim_store_details`:
 
 ```
+ALTER TABLE dim_store_details
+DROP COLUMN lat; -- Dropped lat as it is a null column.
+```
+- Dropping lat as it is a null column
 
 ```
+SELECT -- calculate the length of the mentioned columns below 
+	MAX(LENGTH(store_code::TEXT)) AS max_store_code_length,
+	MAX(LENGTH(country_code::TEXT)) AS max_country_code_length
+FROM dim_store_details;
+```
+- Confirm the length of `store_code` and `country_code`.
+  
+```
+UPDATE dim_store_details
+SET address = NULL, longitude = NULL, locality = NULL
+WHERE address = 'N/A';
+```
+- Converting `N/A` into `NULL`, it had to be updated before altering the table with the requiremnets below.
+- As `longitude`, `latitude` and `locality` columns contain `N/A` values.
 
 ```
+ALTER TABLE dim_store_details
+ALTER COLUMN longitude SET DATA TYPE NUMERIC(15,5) USING longitude::NUMERIC,
+ALTER COLUMN locality SET DATA TYPE VARCHAR(255),
+ALTER COLUMN store_code SET DATA TYPE VARCHAR(12),
+ALTER COLUMN staff_numbers SET DATA TYPE SMALLINT USING staff_numbers::SMALLINT,
+ALTER COLUMN opening_date SET DATA TYPE DATE USING opening_date::DATE,
+ALTER COLUMN store_type SET DATA TYPE VARCHAR(255),
+ALTER COLUMN latitude SET DATA TYPE NUMERIC(15,5) USING latitude::NUMERIC,
+ALTER COLUMN country_code SET DATA TYPE VARCHAR(2),
+ALTER COLUMN continent SET DATA TYPE VARCHAR(255);
+```
+
+#### Task 4: Editing `dim_products` table for the delivery team:
 
 ```
+SELECT DISTINCT product_price 
+FROM dim_products 
+WHERE product_price LIKE '%£%';
+
+ALTER TABLE dim_products
+ADD COLUMN weight_class VARCHAR(20);
+
+UPDATE dim_products
+SET weight_class = CASE
+    WHEN weight < 2 THEN 'Light'
+    WHEN weight >= 2 AND weight < 40 THEN 'Mid_Sized'
+    WHEN weight >= 40 AND weight < 140 THEN 'Heavy'
+    WHEN weight >= 140 THEN 'Truck_Required'
+END;
+```
+- This short script focused on removing `£` from `product_price`.
+- Created a new column called `weight_class`.
+- Uploaded different weights into `weight_class` column.
+
+#### Task 5: Updating data types in `dim_products` table:
+
+```
+ALTER TABLE dim_products
+RENAME COLUMN removed TO still_available;
+
+
+SELECT 
+    MAX(LENGTH("EAN" ::TEXT)) AS max_ean_length,
+	 MAX(LENGTH(weight_class::TEXT)) AS max_weight_class_length,
+    MAX(LENGTH(product_code::TEXT)) AS max_product_code_length
+FROM dim_products;
+```
+- Renamed a column from `removed` to `still_available`.
+- Calculate the character length of each `EAN` , `weight_class` and `product_code`.
+```
+UPDATE dim_products
+SET still_available = CASE
+    WHEN still_available = 'Still available' THEN 'TRUE'
+    ELSE 'FALSE'
+END;
+
+ALTER TABLE dim_products
+    ALTER COLUMN product_price SET DATA TYPE NUMERIC USING product_price::NUMERIC,
+    ALTER COLUMN weight SET DATA TYPE NUMERIC USING weight::NUMERIC,
+	 ALTER COLUMN "EAN" SET DATA TYPE VARCHAR(17),
+	 ALTER COLUMN product_code SET DATA TYPE VARCHAR(11),  
+    ALTER COLUMN date_added SET DATA TYPE DATE USING date_added::DATE,
+    ALTER COLUMN uuid SET DATA TYPE UUID USING uuid::UUID,
+    ALTER COLUMN still_available SET DATA TYPE BOOL USING still_available::BOOL,
+    ALTER COLUMN weight_class SET DATA TYPE VARCHAR(14);
+```
+- This query will update the `still_available` column by changing the value "Still available" to `TRUE` and all other values to `FALSE`, effectively converting the column to a boolean type.
+- `Alter Table` converts data type depending on the requirements.
+
+#### Task 6: Updating data types in `dim_date_times` table:
+
+```
+SELECT 
+    MAX(LENGTH(month::TEXT)) AS max_month_length,
+    MAX(LENGTH(year::TEXT)) AS max_year_length,
+    MAX(LENGTH(day::TEXT)) AS max_day_length,
+    MAX(LENGTH(time_period)) AS max_time_period_length
+FROM dim_date_times;
+
+
+ALTER TABLE dim_date_times
+    ALTER COLUMN month SET DATA TYPE VARCHAR(2),
+    ALTER COLUMN year SET DATA TYPE VARCHAR(4),
+    ALTER COLUMN day SET DATA TYPE VARCHAR(2),
+    ALTER COLUMN time_period SET DATA TYPE VARCHAR(10),
+    ALTER COLUMN date_uuid SET DATA TYPE UUID USING date_uuid::UUID;
+```
+#### Task 7: Updating data types in `dim_card_details` table:
+
+```
+SELECT 
+    MAX(LENGTH(card_number::TEXT)) AS max_card_number_length,
+    MAX(LENGTH(expiry_date::TEXT)) AS max_expiry_date_length
+FROM dim_card_details;
+
+
+ALTER TABLE dim_card_details
+    ALTER COLUMN card_number SET DATA TYPE VARCHAR(19),
+    ALTER COLUMN expiry_date SET DATA TYPE VARCHAR(5),
+    ALTER COLUMN date_payment_confirmed SET DATA TYPE DATE USING date_payment_confirmed::DATE;
+```
+
+#### Task 8: Creating `primary keys`
+```
+ALTER TABLE dim_users
+    ADD CONSTRAINT pk_user_uuid PRIMARY KEY (user_uuid);
+
+ALTER TABLE dim_store_details
+    ADD CONSTRAINT pk_store_code PRIMARY KEY (store_code);
+
+ALTER TABLE dim_products
+    ADD CONSTRAINT pk_product_code PRIMARY KEY (product_code);
+
+ALTER TABLE dim_date_times
+    ADD CONSTRAINT pk_date_uuid PRIMARY KEY (date_uuid);
+
+ALTER TABLE dim_card_details
+    ADD CONSTRAINT pk_card_number PRIMARY KEY (card_number);
+```
+- In this task, primary keys were added to specific columns in the `dim_` tables to align them with the `orders_table`, which serves as the source of truth for the orders. Each `dim_` table had a column that matched one in the `orders_table`, and we added primary keys to those columns to ensure uniqueness and establish proper relationships.
+
+#### Task 9: Creating `primary keys`
+```
+ALTER TABLE orders_table
+    ADD CONSTRAINT fk_user_uuid FOREIGN KEY (user_uuid)
+    REFERENCES dim_users(user_uuid);
+
+ALTER TABLE orders_table
+    ADD CONSTRAINT fk_store_code FOREIGN KEY (store_code)
+    REFERENCES dim_store_details(store_code);
+
+ALTER TABLE orders_table
+    ADD CONSTRAINT fk_product_code FOREIGN KEY (product_code)
+    REFERENCES dim_products(product_code);
+
+ALTER TABLE orders_table
+    ADD CONSTRAINT fk_date_uuid FOREIGN KEY (date_uuid)
+    REFERENCES dim_date_times(date_uuid);
+
+ALTER TABLE orders_table
+    ADD CONSTRAINT fk_card_number FOREIGN KEY (card_number)
+    REFERENCES dim_card_details(card_number);
+```
+In this task, foreign key constraints were added to the `orders_table` to establish relationships with the primary keys in the corresponding `dim_` tables (e.g., `dim_users`, `dim_store_details`, `dim_products`, `dim_date_times` and `dim_card_details`). This step ensures that the `orders_table` references valid data in the `dim_` tables, enforcing referential integrity across the database. By adding these foreign keys, the star-based schema is completed, ensuring that each order in the `orders_table` is properly linked to the relevant user, store, product, and other dimension data.
 
 ## Milestone 4
 
