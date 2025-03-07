@@ -830,3 +830,36 @@ In this task, foreign key constraints were added to the `orders_table` to establ
 
 ## Milestone 4
 
+#### Task 1: How many physical stores does the business have and in wich countires?
+
+```
+SELECT store_type, COUNT(*) AS store_count
+FROM dim_store_details
+GROUP BY store_type
+ORDER BY store_count DESC;
+```
+
+- This SQL query counts the number of stores for each store type in the dim_store_details table.
+- It groups the data by the store_type column, and for each type, it calculates the number of stores using COUNT(*).
+- As seen below, `Web Portal` stores will be excluded since it is specified. This will display the count of physical stores only.
+
+```
+SELECT country_code, COUNT(country_code) as total_no_stores
+FROM dim_store_details
+WHERE store_type != 'Web Portal'
+GROUP BY country_code
+ORDER BY total_no_stores desc;
+```
+
+#### Task 2: Location with the most stores?
+
+```
+SELECT locality, COUNT(*) AS total_no_stores
+FROM dim_store_details
+GROUP BY locality
+ORDER BY total_no_stores DESC
+LIMIT 7;
+```
+
+#### Task 3: Location with the most stores?
+
