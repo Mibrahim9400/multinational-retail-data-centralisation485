@@ -1,38 +1,38 @@
 # Multinational Retail Data Centralisation
-The Multinational Data Centralisation project focuses on transforming and analyzing large datasets from various sources. It leverages Pandas for data cleaning, generates a STAR-based database schema for efficient storage and access, and develops complex SQL queries for data analysis, offering a comprehensive solution from data acquisition to insightful decision-making.
+<p align="justify"> 
+The Multinational Data Centralisation project focuses on transforming and analyzing large datasets from various sources. It leverages Pandas for data cleaning, generates a STAR-based database schema for efficient storage and access, and develops complex SQL queries for data analysis, offering a comprehensive solution from data acquisition to insightful decision-making.</p>
+<p align="justify">
+This course helped me enhance my skills in data extraction from various database sources, cleaning data from multiple sources using Python, and uploading it to my local PostgreSQL database, sales_data.</p>
 
-This course helped me enhance my skills in data extraction from various database sources, cleaning data from multiple sources using Python, and uploading it to my local PostgreSQL database, `sales_data`.
-
-1. [Milestone 1](#milestone-1)
-   - [Description](#description)
+1. [Description](#description)
+   - [File Structure](#file-structure)
 2. [Milestone 2](#milestone-2)
-   - [Description](#description-1)
    - [User Data](#user-data)
    - [Card Details](#card-details)
    - [Store Details](#store-details)
    - [Product Details](#product-details)
    - [Order tables](#order-tables)
    - [Events Data](#events-data)
-   - [File Structure](#file-structure-1)
 3. [Milestone 3](#milestone-3)
-   - [Description](#description-2)
-   - [File Structure](#file-structure-2)
 4. [Milestone 4](#milestone-4)
-   - [Description](#description-3)
-   - [File Structure](#file-structure-3)
 
-## Milestone 1
-Setting-up Github Environment.
 
-### Description
-This milestone introduces GitHub for tracking and saving code changes in a GitHub repo, which will be use throughout the project.
+## Description
+<p align="justify">
+Milestone 1 focuses on setting up GitHub for version control, enabling the tracking and saving of all code changes throughout the project. By creating a GitHub repository and connecting it to the local environment, it ensures that the code remains well-organized, backed up, and easily accessible for collaboration. GitHub will serve as the primary platform to manage version history, handle branching for feature development, and facilitate smooth coordination.</p>
+<p align="justify"> 
+Milestone 2 involves extracting and cleaning data from a variety of sources, such as RDS tables, PDFs, APIs, and AWS S3 buckets. The goal is to transform the raw data into a structured and usable format by addressing issues like missing values, duplicates, and inconsistencies. Once the data is cleaned and upload to the database, Milestone 3 will focus on designing a star-based database schema, organizing the data into fact and dimension tables for better querying and analysis. In Milestone 4, this step is to use tools like (pgAdmin 4, VSCODE or other SQL compatible applications) to create SQL queries that answer important business questions, pulling valuable insights from the cleaned database to support decision-making.</p>
 
-## Milestone 2
-### Description
-Extracting and cleaning data from various sources, including RDS tables, PDFs, APIs, and AWS S3 buckets. 
+### File Structure
+
+
+
+## Milestone 2 
+### Data Extraction, Reading, Cleaning and Uploading to Local Database.
 
 #### DataConnector Class
 A `DatabaseConnector` is a fixed class which was created to establish connections, reads, creates, lists and upload the data into a local PostgreSQL database.
+
 ```
 from sqlalchemy import create_engine, inspect
 import yaml
@@ -611,8 +611,7 @@ class DataCleaner:
 ```
 
 ## Milestone 3
-This milestone focuses on designing a star-based database schema to ensure that all columns are properly aligned with their appropriate data types for optimal functionality.
-
+### Developing tar-based database schema.
 #### Task 1: Casting `order_table` to Correct Data Type
 ```
 SELECT 
@@ -828,7 +827,7 @@ ALTER TABLE orders_table
 In this task, foreign key constraints were added to the `orders_table` to establish relationships with the primary keys in the corresponding `dim_` tables (e.g., `dim_users`, `dim_store_details`, `dim_products`, `dim_date_times` and `dim_card_details`). This step ensures that the `orders_table` references valid data in the `dim_` tables, enforcing referential integrity across the database. By adding these foreign keys, the star-based schema is completed, ensuring that each order in the `orders_table` is properly linked to the relevant user, store, product, and other dimension data.
 
 ## Milestone 4
-
+### Extracting data and results based on the queries given.
 #### Task 1: How many physical stores does the business have and in wich countires?
 
 ```
@@ -930,8 +929,8 @@ ORDER BY total_sales DESC
 LIMIT 10;
 ```
 
--This script calculates the `total_sales` for each `year` and `month` by joining the `orders_table`, `dim_date_times`, and `dim_products tables`. 
--It sums up the sales amount by multiplying the product quantity with the product price, then groups the results by the `year` and `month` columns from the `dim_date_times` table.
+- This script calculates the `total_sales` for each `year` and `month` by joining the `orders_table`, `dim_date_times`, and `dim_products` tables. 
+- It sums up the sales amount by multiplying the product quantity with the product price, then groups the results by the `year` and `month` columns from the `dim_date_times` table.
 
 #### Task 7: Staff Headcount:
 
