@@ -31,7 +31,6 @@ This milestone introduces GitHub for tracking and saving code changes in a GitHu
 ### Description
 Extracting and cleaning data from various sources, including RDS tables, PDFs, APIs, and AWS S3 buckets. 
 
-
 #### DataConnector Class
 A `DatabaseConnector` is a fixed class which was created to establish connections, reads, creates, lists and upload the data into a local PostgreSQL database.
 ```
@@ -861,5 +860,107 @@ ORDER BY total_no_stores DESC
 LIMIT 7;
 ```
 
-#### Task 3: Location with the most stores?
+#### Task 3: Which months typically have the highest average cost of sales?
 
+```
+SELECT SUM(p.product_price * o.product_quantity) AS total_sales, d.month
+FROM orders_table o
+LEFT JOIN dim_date_times d ON o.date_uuid = d.date_uuid
+LEFT JOIN dim_products p ON o.product_code = p.product_code
+GROUP BY d.month
+ORDER BY total_sales DESC
+LIMIT 6;
+```
+
+- It calculates the total sales for each month by multiplying the product price from dim_products with the product quantity from orders_table.
+- It joins three tables: `orders_table` containing order details, `dim_date_times` providing the month for each order using `date_uuid`, and `dim_products` which contains `product_prices`.
+
+#### Task 4: Number of sales made Online?
+
+```
+SELECT 
+	COUNT(o.product_quantity) AS numbers_of_sales,
+	SUM(o.product_quantity) AS product_quantity_count,
+	CASE 
+		WHEN s.store_type = 'Web Portal' THEN 'Web'
+		ELSE 'Offline'
+	END AS location
+FROM orders_table o
+	LEFT Join dim_store_details s ON o.store_code = s.store_code
+GROUP BY location
+ORDER BY product_quantity_count;
+```
+
+- At first this script counts the number of sales transactions `numbers_of_sales` and sums the total number of products sold `product_quantity_count`.
+- A `CASE` statement classifies store types, grouping `Web Portal` as `Web` and all other store types as `Offline`. 
+- It analyzes sales data by categorizing them into `online` (Web) and `offline` (physical stores) sales and retrieves data from orders_table and `dim_store_details` using a `LEFT JOIN` on store_code.
+
+
+#### Task 5: Sales percentage of each store type?
+
+```
+SELECT
+    s.store_type AS store_details,
+    ROUND(SUM(o.product_quantity * p.product_price) :: NUMERIC, 2) AS number_of_sales,
+	ROUND(COUNT(s.store_type)/ (SELECT COUNT(*) FROM orders_table o) :: NUMERIC * 100 , 2) AS "sales_made(%)"
+
+FROM orders_table o
+    LEFT JOIN dim_store_details s ON o.store_code = s.store_code
+    LEFT JOIN dim_products p ON o.product_code = p.product_code
+GROUP BY store_details
+ORDER BY number_of_sales DESC;
+```
+
+- This script calculates the total sales `number_of_sales` and the percentage of sales `sales_made(%)` for each store type in the database.
+- `LEFT JOIN` is used to connect the `orders_table` with the `dim_store_details` and `dim_products` tables.
+
+#### Task 6: Which month with the highest cost of sales?
+
+```
+SELECT 
+	SUM(o.product_quantity * p.product_price) AS total_sales,
+    dt.year,
+    dt.month
+
+FROM orders_table o	
+    LEFT JOIN dim_date_times dt ON o.date_uuid = dt.date_uuid
+    LEFT JOIN dim_products p ON o.product_code = p.product_code
+GROUP BY dt.year, dt.month
+ORDER BY total_sales DESC
+LIMIT 10;
+```
+
+-This script calculates the `total_sales` for each `year` and `month` by joining the `orders_table`, `dim_date_times`, and `dim_products tables`. 
+-It sums up the sales amount by multiplying the product quantity with the product price, then groups the results by the `year` and `month` columns from the `dim_date_times` table.
+
+#### Task 7: Staff Headcount:
+
+```
+SELECT SUM(staff_numbers) AS total_staff_numbers, country_code
+FROM dim_store_details
+GROUP BY country_code
+ORDER BY total_staff_numbers DESC;
+```
+
+#### Task 8: Sales in German store type:
+
+```
+SELECT 
+	ROUND(SUM(o.product_quantity * p.product_price), 2) AS total_sales, 
+	s.store_type, 
+	s.country_code
+
+FROM orders_table o
+	LEFT JOIN dim_store_details s on o.store_code = s.store_code
+	LEFT JOIN dim_products p on o.product_code = p.product_code
+WHERE s.country_code = 'DE'
+GROUP BY s.store_type, s.country_code
+ORDER BY total_sales ASC;
+```
+
+#### Task 9:
+
+```
+
+
+```
