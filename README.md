@@ -960,6 +960,45 @@ ORDER BY total_sales ASC;
 #### Task 9:
 
 ```
+WITH timestamp_conversion AS (
+    SELECT 
+        to_timestamp(
+            CONCAT(year, '-', month, '-', day, ' ', 
+                   EXTRACT(hour FROM timestamp::time), ':', 
+                   EXTRACT(minute FROM timestamp::time), ':', 
+                   EXTRACT(second FROM timestamp::time)), 
+            'YYYY-MM-DD HH24:MI:SS'
+        ) AS time_stamp, 
+        year
+    FROM dim_date_times
+),
+lead_timestamp AS (
+    SELECT 
+        year,
+        time_stamp,
+        LEAD(time_stamp) OVER (ORDER BY time_stamp DESC) AS lead
+    FROM timestamp_conversion
+),
+average_time_diff AS (
+    SELECT 
+        year,
+        AVG(time_stamp - lead) AS avg_times
+    FROM lead_timestamp
+    WHERE lead IS NOT NULL
+    GROUP BY year
+    ORDER BY year DESC
+)
 
-
+SELECT 
+    year, 
+    CONCAT('"hours": ', EXTRACT(hour FROM avg_times), 
+           ', "minutes": ', EXTRACT(minute FROM avg_times), 
+           ', "seconds": ', ROUND(EXTRACT(second FROM avg_times)), 
+           ', "milliseconds": ', ROUND(EXTRACT(milliseconds FROM avg_times))) AS actual_time_taken
+FROM average_time_diff 
+ORDER BY avg_times DESC
+LIMIT 5;
 ```
+
+- This SQL script calculates the average time difference between consecutive timestamps for each year.
+- It converts date and time components into valid timestamps, computes time gaps using `LEAD()`, and averages them.
