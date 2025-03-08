@@ -16,7 +16,6 @@ This course helped me enhance my skills in data extraction from various database
 3. [Milestone 3](#milestone-3)
 4. [Milestone 4](#milestone-4)
 
-
 ## Description
 <p align="justify">
 Milestone 1 focuses on setting up GitHub for version control, enabling the tracking and saving of all code changes throughout the project. By creating a GitHub repository and connecting it to the local environment, it ensures that the code remains well-organized, backed up, and easily accessible for collaboration. GitHub will serve as the primary platform to manage version history, handle branching for feature development, and facilitate smooth coordination.</p>
