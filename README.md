@@ -24,8 +24,11 @@ Milestone 1 focuses on setting up GitHub for version control, enabling the track
 Milestone 2 involves extracting and cleaning data from a variety of sources, such as RDS tables, PDFs, APIs, and AWS S3 buckets. The goal is to transform the raw data into a structured and usable format by addressing issues like missing values, duplicates, and inconsistencies. Once the data is cleaned and upload to the database, Milestone 3 will focus on designing a star-based database schema, organizing the data into fact and dimension tables for better querying and analysis. In Milestone 4, this step is to use tools like (pgAdmin 4, VSCODE or other SQL compatible applications) to create SQL queries that answer important business questions, pulling valuable insights from the cleaned database to support decision-making.</p>
 
 ### File Structure
-
-
+Related Files: 
+1. `data_cleaning.py`
+2. `data_extraction.py`
+3. `database_ulits.py`
+- The file structure includes Python scripts for all task requirements used throughout this project.
 
 ## Milestone 2 
 ### Data Extraction, Reading, Cleaning and Uploading to Local Database.
